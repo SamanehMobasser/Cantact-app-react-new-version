@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useContacts } from "../context/ContactsContext";
 import { ActionTypes } from "../context/ContactsContext";
+import { Formik, Field, Form } from "formik";
+import { contactValidationSchema } from "../schemas/validationSchema"; // وارد کردن schema از فایل جداگانه
 import styles from "./ContactForm.module.css";
+import { toast } from "react-toastify";
 
+// مقادیر اولیه فرم
 const initialForm = { name: "", lastName: "", email: "", phone: "" };
 
 const ContactForm = () => {
@@ -11,73 +15,38 @@ const ContactForm = () => {
 
   const isEditMode = modal?.isOpen && modal?.type === "EDIT_CONTACT";
   const [formData, setFormData] = useState(initialForm);
-  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (isEditMode && modal.data) {
-      setFormData(modal.data); 
+      setFormData(modal.data);
     } else {
       setFormData(initialForm);
     }
-  }, [modal.type, modal.data?.id]); 
+  }, [modal.type, modal.data?.id]);
 
-  const changeHandler = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const validate = () => {
-    const errs = {};
-  
-    // اعتبارسنجی نام
-    if (!formData.name) {
-      errs.name = "Name is required";
-    } else if (formData.name.length < 3) {
-      errs.name = "Name must be at least 3 characters";
-    } else if (formData.name.length > 50) {
-      errs.name = "Name must be less than 50 characters";
-    }
-  
-    // اعتبارسنجی نام خانوادگی
-    if (!formData.lastName) {
-      errs.lastName = "Last name is required";
-    } else if (formData.lastName.length < 2) {
-      errs.lastName = "Last name must be at least 2 characters";
-    } else if (formData.lastName.length > 100) {
-      errs.lastName = "Last name must be less than 100 characters";
-    }
-  
-    // اعتبارسنجی ایمیل
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formData.email)) {
-      errs.email = "Valid email required";
-    }
-  
-    // اعتبارسنجی شماره تلفن
-    if (!/^\d{10,15}$/.test(formData.phone)) {
-      errs.phone = "Phone must be 10-15 digits";
-    }
-  
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
-  
-
-  const submitHandler = () => {
-    if (!validate()) return;
-
+  // ارسال فرم
+  const submitHandler = (values) => {
     if (isEditMode) {
       dispatch({
         type: ActionTypes.EDIT_CONTACT,
-        payload: { ...formData, id: modal.data.id },
+        payload: { ...values, id: modal.data.id },
+      });
+      toast.success("Contact edited successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
       });
     } else {
       dispatch({
         type: ActionTypes.ADD_CONTACT,
-        payload: { ...formData, id: Date.now() },
+        payload: { ...values, id: Date.now() },
       });
     }
 
     setFormData(initialForm);
-    setErrors({});
     dispatch({
       type: ActionTypes.SET_MODAL,
       payload: { isOpen: false, type: null, data: null },
@@ -85,54 +54,70 @@ const ContactForm = () => {
   };
 
   return (
-    <div className={styles.form}>
-      <div className={styles.inputWrapper}>
-        <input
-          name="name"
-          value={formData.name}
-          onChange={changeHandler}
-          placeholder="Name"
-          className={errors.name ? styles.invalid : ""}
-        />
-        {errors.name && <span className={styles.star}>*</span>}
-      </div>
+    <div className={styles.formContainer}>
+      <Formik
+        initialValues={formData} // مقداردهی اولیه
+        validationSchema={contactValidationSchema} // استفاده از schema برای اعتبارسنجی
+        enableReinitialize={true} // برای بازنشانی مقادیر اولیه فرم
+        onSubmit={submitHandler} // ارسال داده‌ها به هنگام submit
+      >
+        {({ touched, errors }) => (
+          <Form className={styles.form}>
+            {/* ورودی نام */}
+            <div className={styles.inputWrapper}>
+              <Field
+                name="name"
+                placeholder="Name"
+                className={touched.name && errors.name ? styles.invalid : ""}
+              />
+              {touched.name && errors.name && (
+                <div className={styles.error}>{errors.name}</div>
+              )}
+            </div>
 
-      <div className={styles.inputWrapper}>
-        <input
-          name="lastName"
-          value={formData.lastName}
-          onChange={changeHandler}
-          placeholder="Last Name"
-          className={errors.lastName ? styles.invalid : ""}
-        />
-        {errors.lastName && <span className={styles.star}>*</span>}
-      </div>
+            {/* ورودی نام خانوادگی */}
+            <div className={styles.inputWrapper}>
+              <Field
+                name="lastName"
+                placeholder="Last Name"
+                className={touched.lastName && errors.lastName ? styles.invalid : ""}
+              />
+              {touched.lastName && errors.lastName && (
+                <div className={styles.error}>{errors.lastName}</div>
+              )}
+            </div>
 
-      <div className={styles.inputWrapper}>
-        <input
-          name="email"
-          value={formData.email}
-          onChange={changeHandler}
-          placeholder="Email"
-          className={errors.email ? styles.invalid : ""}
-        />
-        {errors.email && <span className={styles.star}>*</span>}
-      </div>
+            {/* ورودی ایمیل */}
+            <div className={styles.inputWrapper}>
+              <Field
+                name="email"
+                placeholder="Email"
+                className={touched.email && errors.email ? styles.invalid : ""}
+              />
+              {touched.email && errors.email && (
+                <div className={styles.error}>{errors.email}</div>
+              )}
+            </div>
 
-      <div className={styles.inputWrapper}>
-        <input
-          name="phone"
-          value={formData.phone}
-          onChange={changeHandler}
-          placeholder="Phone"
-          className={errors.phone ? styles.invalid : ""}
-        />
-        {errors.phone && <span className={styles.star}>*</span>}
-      </div>
+            {/* ورودی شماره تلفن */}
+            <div className={styles.inputWrapper}>
+              <Field
+                name="phone"
+                placeholder="Phone"
+                className={touched.phone && errors.phone ? styles.invalid : ""}
+              />
+              {touched.phone && errors.phone && (
+                <div className={styles.error}>{errors.phone}</div>
+              )}
+            </div>
 
-      <button onClick={submitHandler}>
-        {isEditMode ? "✏️ Edit Contact" : "➕ Add Contact"}
-      </button>
+            {/* دکمه ارسال */}
+            <button type="submit">
+              {isEditMode ? "✏️ Edit Contact" : "➕ Add Contact"}
+            </button>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };

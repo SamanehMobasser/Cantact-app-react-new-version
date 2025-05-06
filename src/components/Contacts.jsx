@@ -7,6 +7,7 @@ import ContactsList from "./ContactsList";
 import Search from "./Search";
 import ConfirmModal from "./ConfirmModal";
 import styles from "./Contacts.module.css";
+import { toast } from "react-toastify";
 
 const Contacts = () => {
   const { state, dispatch } = useContacts();
@@ -29,8 +30,9 @@ const Contacts = () => {
           payload: id,
         });
       });
-    }
+    } // ← این خط قبلاً نبود و باعث بروز خطا شده بود
   };
+  
 
   // ویرایش
   const editHandler = (id) => {
@@ -40,13 +42,12 @@ const Contacts = () => {
         type: ActionTypes.SET_MODAL,
         payload: {
           isOpen: true,
-          type: "CONFIRM_EDIT", 
-          data: contactToEdit, 
+          type: "CONFIRM_EDIT", // پنجره مدال برای ویرایش
+          data: contactToEdit,
         },
       });
     }
   };
-
 
   const toggleSelectHandler = (id) => {
     const newSelected = selectedIds.includes(id)
@@ -59,19 +60,14 @@ const Contacts = () => {
     });
   };
 
- 
-
   return (
     <div className={styles.container}>
       <h2>📒 Contact Manager</h2>
 
-      
       <ContactForm />
 
-     
       <Search value={searchTerm} onChange={setSearchTerm} />
 
-     
       <ContactsList
         contacts={filteredContacts}
         selectedIds={selectedIds}
@@ -80,7 +76,6 @@ const Contacts = () => {
         toggleSelectHandler={toggleSelectHandler}
       />
 
-      
       {modal.isOpen && <ConfirmModal />}
     </div>
   );
