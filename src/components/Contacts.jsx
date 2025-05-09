@@ -21,7 +21,7 @@ const Contacts = () => {
       contact.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  // حذف تکی
+
   const deleteHandler = (ids) => {
     if (ids) {
       ids.forEach((id) => {
@@ -30,11 +30,11 @@ const Contacts = () => {
           payload: id,
         });
       });
-    } // ← این خط قبلاً نبود و باعث بروز خطا شده بود
+    }
   };
   
 
-  // ویرایش
+
   const editHandler = (id) => {
     const contactToEdit = contacts.find((c) => c.id === id);
     if (contactToEdit) {
@@ -42,7 +42,7 @@ const Contacts = () => {
         type: ActionTypes.SET_MODAL,
         payload: {
           isOpen: true,
-          type: "CONFIRM_EDIT", // پنجره مدال برای ویرایش
+          type: "CONFIRM_EDIT",
           data: contactToEdit,
         },
       });

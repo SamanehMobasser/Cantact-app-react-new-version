@@ -17,7 +17,7 @@ const ConfirmModal = () => {
 
   const confirmHandler = () => {
     if (type === "CONFIRM_EDIT") {
-      // برای ویرایش تماس
+     
       dispatch({
         type: ActionTypes.SET_MODAL,
         payload: { isOpen: false, type: null, data: null },
@@ -31,7 +31,7 @@ const ConfirmModal = () => {
     }
 
     if (type === "DELETE_CONTACT") {
-      // برای حذف تماس
+    
       dispatch({ type: ActionTypes.DELETE_CONTACT, payload: data.id });
 
       toast.success("Contact deleted successfully!", {
@@ -41,14 +41,13 @@ const ConfirmModal = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-      }); // نوتیفیکیشن موفقیت بعد از حذف
-
-      closeModal(); // بستن مدال بعد از انجام عملیات
+      });
+      closeModal(); 
       return;
     }
 
     if (type === "DELETE_SELECTED") {
-      // برای حذف گروهی
+    
       dispatch({ type: ActionTypes.DELETE_SELECTED });
 
       toast.success("Selected contacts deleted successfully!", {
@@ -58,14 +57,13 @@ const ConfirmModal = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-      }); // نوتیفیکیشن موفقیت بعد از حذف گروهی
-
-      closeModal(); // بستن مدال بعد از انجام عملیات
+      });
+      closeModal();
       return;
     }
   };
 
-  // اگر مدال باز نباشد یا نوع عملیات شناخته‌شده نباشد، مدال نمایش داده نمی‌شود.
+ 
   if (
     !isOpen ||
     (type !== "CONFIRM_EDIT" &&

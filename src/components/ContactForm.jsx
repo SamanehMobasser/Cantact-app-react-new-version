@@ -6,7 +6,7 @@ import { contactValidationSchema } from "../schemas/validationSchema"; // وار
 import styles from "./ContactForm.module.css";
 import { toast } from "react-toastify";
 
-// مقادیر اولیه فرم
+
 const initialForm = { name: "", lastName: "", email: "", phone: "" };
 
 const ContactForm = () => {
@@ -24,8 +24,8 @@ const ContactForm = () => {
     }
   }, [modal.type, modal.data?.id]);
 
-  // ارسال فرم
-  const submitHandler = (values) => {
+  
+  const submitHandler = (values,{ resetForm }) => {
     if (isEditMode) {
       dispatch({
         type: ActionTypes.EDIT_CONTACT,
@@ -46,7 +46,7 @@ const ContactForm = () => {
       });
     }
 
-    setFormData(initialForm);
+    resetForm();
     dispatch({
       type: ActionTypes.SET_MODAL,
       payload: { isOpen: false, type: null, data: null },
@@ -56,10 +56,10 @@ const ContactForm = () => {
   return (
     <div className={styles.formContainer}>
       <Formik
-        initialValues={formData} // مقداردهی اولیه
-        validationSchema={contactValidationSchema} // استفاده از schema برای اعتبارسنجی
-        enableReinitialize={true} // برای بازنشانی مقادیر اولیه فرم
-        onSubmit={submitHandler} // ارسال داده‌ها به هنگام submit
+        initialValues={formData} 
+        validationSchema={contactValidationSchema} 
+        enableReinitialize={true}
+        onSubmit={submitHandler}
       >
         {({ touched, errors }) => (
           <Form className={styles.form}>
@@ -75,7 +75,7 @@ const ContactForm = () => {
               )}
             </div>
 
-            {/* ورودی نام خانوادگی */}
+          
             <div className={styles.inputWrapper}>
               <Field
                 name="lastName"
@@ -87,7 +87,7 @@ const ContactForm = () => {
               )}
             </div>
 
-            {/* ورودی ایمیل */}
+            
             <div className={styles.inputWrapper}>
               <Field
                 name="email"
@@ -99,7 +99,7 @@ const ContactForm = () => {
               )}
             </div>
 
-            {/* ورودی شماره تلفن */}
+            
             <div className={styles.inputWrapper}>
               <Field
                 name="phone"
@@ -111,7 +111,7 @@ const ContactForm = () => {
               )}
             </div>
 
-            {/* دکمه ارسال */}
+            
             <button type="submit">
               {isEditMode ? "✏️ Edit Contact" : "➕ Add Contact"}
             </button>
